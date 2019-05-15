@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
     {
         MovePlayer();
         if (Input.GetAxis("Fire1") == 0) fire1Pressed = false;
-        else if (!fire1Pressed && Input.GetAxis("Fire1") != 0)
+        else if (cylinderState != -1 && !fire1Pressed && Input.GetAxis("Fire1") != 0)
         {
             fire1Pressed = true;
             if (cylinderState == 0)
