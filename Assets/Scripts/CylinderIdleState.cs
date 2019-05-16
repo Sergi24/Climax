@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IdleState : StateMachineBehaviour
+public class CylinderIdleState : StateMachineBehaviour
 {
     //OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        GameObject.Find("Player").GetComponent<Player>().SetActionToIdle();
+        Cylinder.instance.ReturnCylinderToOrigin();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

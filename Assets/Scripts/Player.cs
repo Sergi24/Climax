@@ -2,20 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerActions
-{
-    Cylinder_move1
-}
-
 public class Player : MonoBehaviour
 {
     public static Player instance = null;
-    public float speed, rotationSpeed;
-    public GameObject cylinderAttack;
-    public GameObject cylinderAttackPosition;
+    public float speed, rotationSpeed, teleportationRange;
+    public GameObject jumpTrail, shadow;
 
-    private bool fire1Pressed = false, fire2Pressed = false;
-    private int cylinderState = 0;
+    private bool jumpPressed = false, inverseJumpPressed = false;
 
     private void Awake()
     {
@@ -27,31 +20,25 @@ public class Player : MonoBehaviour
     void Update()
     {
         MovePlayer();
-        if (Input.GetAxis("Fire1") == 0) fire1Pressed = false;
-        else if (cylinderState != -1 && !fire1Pressed && Input.GetAxis("Fire1") != 0)
+        if (jumpPressed || inverseJumpPressed)
         {
-            fire1Pressed = true;
-            if (cylinderState == 0)
-            {
-                cylinderAttack.transform.parent = null;
-                cylinderAttack.GetComponentInChildren<Animator>().SetTrigger("Attack");
-            }
-            else if (cylinderState == 1)
-            {
-                cylinderAttack.GetComponentInChildren<Animator>().SetTrigger("Attack");
-            }
-            cylinderState++;
+            ParticleSystem.EmissionModule emissionModule = jumpTrail.GetComponent<ParticleSystem>().emission;
+            emissionModule.enabled = false;
         }
-        if (Input.GetAxis("Fire2") == 0) fire2Pressed = false;
-        if (!fire2Pressed && Input.GetAxis("Fire2") != 0)
+
+        if (Input.GetAxis("Jump") == 0) jumpPressed = false;
+        else if (Input.GetAxis("Jump") != 0 && !jumpPressed)
         {
-            fire2Pressed = true;
-            if (cylinderState == 0)
-            {
-                cylinderAttack.transform.parent = null;
-                cylinderAttack.GetComponentInChildren<Animator>().SetTrigger("LargeAttack");
-                cylinderState = -1;
-            }
+            jumpPressed = true;
+            TeleportPlayer();
+        }
+
+        if (Input.GetAxis("InverseJump") == 0) inverseJumpPressed = false;
+        else if (Input.GetAxis("InverseJump") != 0 && !inverseJumpPressed)
+        {
+            inverseJumpPressed = true;
+            TeleportPlayer();
+            transform.Rotate(Vector3.up * 180);
         }
     }
 
@@ -61,28 +48,11 @@ public class Player : MonoBehaviour
         transform.Translate(Vector3.forward * Input.GetAxis("Vertical") * speed * Time.deltaTime);
     }
 
-    public void SetActionToIdle()
+    public void TeleportPlayer()
     {
-        StartCoroutine(ReturnCylinderToOrigin());
-    }
-
-    private IEnumerator ReturnCylinderToOrigin()
-    {
-        cylinderState = -1;
-
-        float t = 0;
-        Vector3 initialPosition = cylinderAttack.transform.position;
-        Quaternion initialRotation = cylinderAttack.transform.rotation;
-        while (t < 1)
-        {
-            yield return null;
-            cylinderAttack.transform.position = Vector3.Lerp(initialPosition, cylinderAttackPosition.transform.position, t);
-            cylinderAttack.transform.rotation = Quaternion.Slerp(initialRotation, cylinderAttackPosition.transform.rotation, t);
-            t += 0.05f;
-        }
-
-        cylinderState = 0;
-        cylinderAttack.transform.parent = gameObject.transform;
-        cylinderAttack.transform.position = cylinderAttackPosition.transform.position;
+        Instantiate(shadow, transform.position, transform.rotation);
+        ParticleSystem.EmissionModule emissionModule = jumpTrail.GetComponent<ParticleSystem>().emission;
+        emissionModule.enabled = true;
+        transform.Translate(Vector3.forward * teleportationRange);
     }
 }

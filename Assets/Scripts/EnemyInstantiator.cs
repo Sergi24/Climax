@@ -5,8 +5,7 @@ using UnityEngine;
 public class EnemyInstantiator : MonoBehaviour
 {
     public GameObject enemy;
-    public int rate;
-    public float circularSpeed, radius;
+    public float rate, circularSpeed, radius;
 
     private float angle;
 

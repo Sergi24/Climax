@@ -46,4 +46,4 @@ MonoBehaviour:
   enemy: {fileID: 3465166738343622271, guid: 71a3f8d8a36d28f4f9fe6038147e588f, type: 3}
   rate: 1
   circularSpeed: 111
-  radius: 2
+  radius: 5
