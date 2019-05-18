@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CylinderIdleState : StateMachineBehaviour
+public class StartRotationSpike : StateMachineBehaviour
 {
-    //OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
+    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Cylinder.instance.ReturnCylinderToOrigin();
+        animator.gameObject.GetComponentInParent<Spike>().StartRotation();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
