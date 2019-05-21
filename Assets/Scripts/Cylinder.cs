@@ -7,11 +7,17 @@ public class Cylinder : PlayerObject
     public static Cylinder instance = null;
 
     private bool fire1Pressed = false, fire2Pressed = false;
+    private AudioSource asource;
 
     private void Awake()
     {
         if (instance == null) instance = this;
         else Destroy(this);
+    }
+
+    private void Start()
+    {
+        asource = gameObject.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -25,6 +31,7 @@ public class Cylinder : PlayerObject
             {
                 gameObject.transform.parent = null;
                 gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+                PlayAirCutSound(1.1f);
             }
             else if (objectState == 1)
             {
@@ -43,5 +50,16 @@ public class Cylinder : PlayerObject
                 objectState = -1;
             }
         }
+    }
+
+    public void PlayAirCutSound(float delay)
+    {
+        StartCoroutine(PlayAirCutSoundCoroutine(delay));
+    }
+
+    public IEnumerator PlayAirCutSoundCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        asource.Play();
     }
 }

@@ -5,9 +5,9 @@ using UnityEngine;
 public class Spike : PlayerObject
 {
     public float rotationSpeed;
-    public GameObject largeAttackInitialPosition;
+    public GameObject basicAttackPosition, largeAttackInitialPosition;
 
-    private bool fire3Pressed = false;
+    private bool fire3Pressed = false, fire4Pressed = false;
     private float initialRotationSpeed;
 
     private void Start()
@@ -26,22 +26,37 @@ public class Spike : PlayerObject
         else if (objectState == 0 && Input.GetAxis("Fire3") != 0 && !fire3Pressed)
         {
             fire3Pressed = true;
+            gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+            gameObject.transform.parent = null;
+            StartCoroutine(InitialMovement(basicAttackPosition, false));
+        }
+
+        if (Input.GetAxis("Fire4") == 0) fire4Pressed = false;
+        else if (objectState == 0 && Input.GetAxis("Fire4") != 0 && !fire4Pressed)
+        {
+            fire4Pressed = true;
             gameObject.GetComponentInChildren<Animator>().SetTrigger("LargeAttack");
             gameObject.transform.parent = null;
-            StartCoroutine(InitialMovement());
+            StartCoroutine(LargeAttackCoroutine());
         }
     }
 
-    public IEnumerator InitialMovement()
+    public IEnumerator LargeAttackCoroutine()
     {
-        Vector3 destinationPosition = largeAttackInitialPosition.transform.position;
-        float angleIncrement = 3;
+        yield return StartCoroutine(InitialMovement(largeAttackInitialPosition, true));
+        gameObject.GetComponentInChildren<Animator>().SetTrigger("BeginLargeAttack");
+    }
+
+    public IEnumerator InitialMovement(GameObject position, bool Ymovement)
+    {
+        Vector3 destinationPosition = position.transform.position;
+        float angleIncrement = 4;
         float height = 3;
         Vector3 initialPosition = transform.position;
         Vector3 movementVector = destinationPosition - initialPosition;
         Vector3 portionMovementVector = movementVector / (180 / angleIncrement);
 
-        float perpendicularForce = 0.4f;
+        float perpendicularForce = 0.3f;
         Vector2 perpendicularDirection = Vector2.Perpendicular(new Vector2(movementVector.x, movementVector.z));
 
         float angle = 0;
@@ -52,11 +67,10 @@ public class Spike : PlayerObject
             transform.position = initialPosition + (portionMovementVector * count);
             count++;
             
-            transform.position = new Vector3(transform.position.x, initialPosition.y + (height * Mathf.Sin(angle * Mathf.Deg2Rad)), transform.position.z);
+            if (Ymovement) transform.position = new Vector3(transform.position.x, initialPosition.y + (height * Mathf.Sin(angle * Mathf.Deg2Rad)), transform.position.z);
             transform.position = new Vector3(transform.position.x + (perpendicularForce * perpendicularDirection.x * Mathf.Sin(angle * Mathf.Deg2Rad)), transform.position.y, transform.position.z + (perpendicularForce * perpendicularDirection.y * Mathf.Sin(angle * Mathf.Deg2Rad)));
             angle+=angleIncrement;
         }
-        gameObject.GetComponentInChildren<Animator>().SetTrigger("BeginAttack");
     }
 
     public void StartRotation()

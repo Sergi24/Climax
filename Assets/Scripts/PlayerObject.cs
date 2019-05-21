@@ -25,7 +25,7 @@ public class PlayerObject: MonoBehaviour
             yield return null;
             gameObject.transform.position = Vector3.Lerp(initialPosition, position.transform.position, t);
             gameObject.transform.rotation = Quaternion.Slerp(initialRotation, position.transform.rotation, t);
-            t += 0.05f;
+            t += 0.03f;
         }
 
         objectState = 0;
